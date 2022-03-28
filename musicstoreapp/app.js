@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const {MongoClient} = require("mongodb");
+const url = "mongodb+srv://admin:sdi@tiendamusica.i6wnd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 var app = express();
 
@@ -12,7 +14,9 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-require("./routes/songs.js")(app);
+
+app.set('connectionStrings', url);
+require("./routes/songs.js")(app, MongoClient);
 require("./routes/authors.js")(app);
 
 
