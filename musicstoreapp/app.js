@@ -7,6 +7,13 @@ const {MongoClient} = require("mongodb");
 const url = "mongodb+srv://admin:sdi@tiendamusica.i6wnd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 var app = express();
+let fileUpload = require('express-fileupload');
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 },
+  createParentPath: true
+}));
+
+app.set('uploadPath', __dirname);
 
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
