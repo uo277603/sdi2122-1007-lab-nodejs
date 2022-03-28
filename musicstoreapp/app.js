@@ -36,6 +36,14 @@ const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
 require("./routes/users.js")(app, usersRepository);
 
+const userSessionRouter = require('./routes/userSessionRouter');
+const userAudiosRouter = require('./routes/userAudiosRouter');
+app.use("/songs/add",userSessionRouter);
+app.use("/publications",userSessionRouter);
+app.use("/audios/",userAudiosRouter);
+app.use("/shop/",userSessionRouter)
+
+
 app.set('connectionStrings', url);
 let songRepository = require("./repositories/songsRepository.js");
 songRepository.init(app, MongoClient);
