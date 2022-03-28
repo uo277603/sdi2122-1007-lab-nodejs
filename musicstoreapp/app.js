@@ -16,7 +16,9 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 app.set('connectionStrings', url);
-require("./routes/songs.js")(app, MongoClient);
+let songRepository = require("./repositories/songsRepository.js");
+songRepository.init(app, MongoClient);
+require("./routes/songs.js")(app, songRepository);
 require("./routes/authors.js")(app);
 
 
