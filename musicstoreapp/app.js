@@ -47,9 +47,12 @@ app.use("/shop/",userSessionRouter)
 app.set('connectionStrings', url);
 let songRepository = require("./repositories/songsRepository.js");
 songRepository.init(app, MongoClient);
-require("./routes/songs.js")(app, songRepository);
+let commentsRepository = require("./repositories/commentsRepository.js");
+commentsRepository.init(app, MongoClient);
+require("./routes/songs.js")(app, songRepository, commentsRepository);
 require("./routes/authors.js")(app);
 require("./routes/users.js")(app, usersRepository);
+require("./routes/comments.js")(app, commentsRepository);
 
 
 
