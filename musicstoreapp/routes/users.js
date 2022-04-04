@@ -2,9 +2,11 @@ module.exports = function (app, usersRepository) {
   app.get('/users', function (req, res) {
     res.send('lista de usuarios');
   })
+
   app.get('/users/signup', function (req, res) {
     res.render("signup.twig");
   })
+
   app.post('/users/signup', function (req, res) {
     let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
         .update(req.body.password).digest('hex');
@@ -14,11 +16,15 @@ module.exports = function (app, usersRepository) {
     }
     usersRepository.insertUser(user).then(userId => {
       //res.send('Usuario registrado ' + userId);
-      res.redirect("/publications");
+      res.redirect("/users/login" + '?message=Nuevo usuario registrado.' +
+        "&messageType=alert-info");
     }).catch(error => {
-      res.send("Error al insertar el usuario");
+      res.redirect("/users/signup" +
+        "?message=Se ha producido un error al registrar el usuario."+
+        "&messageType=alert-danger");
     });
   });
+
   app.get('/users/login', function (req, res) {
     res.render("login.twig");
   })
@@ -34,7 +40,11 @@ module.exports = function (app, usersRepository) {
     usersRepository.findUser(filter, options).then(user => {
       if(user == null){
         req.session.user = null;
-        res.send("Usuario no identificado");
+        //res.send("Usuario no identificado");
+        res.redirect("/users/login" +
+            "?message=Email o password incorrecto"+
+            "&messageType=alert-danger ");
+
       }else{
         req.session.user = user.email;
         //res.send("Usuario identificado correctamente: " + user.email);
@@ -42,9 +52,13 @@ module.exports = function (app, usersRepository) {
       }
     }).catch(error => {
       req.session.user = null;
-      res.send("Se ha producido un error al buscar el usuario: " + error);
+      //res.send("Se ha producido un error al buscar el usuario: " + error);
+      res.redirect("/users/login" +
+          "?message=Se ha producido un error al buscar el usuario"+
+          "&messageType=alert-danger ");
     })
   })
+
   app.get('/users/logout', function (req, res) {
     req.session.user = null;
     res.send("El usuario se ha desconectado correctamente");
