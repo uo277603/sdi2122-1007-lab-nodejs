@@ -162,9 +162,10 @@ module.exports = function (app, songsRepository, commentsRepository) {
         let filter = {_id: ObjectId(req.params.id)};
         let options = {};
         let filterComments = {song_id: ObjectId(req.params.id)};
+        let email = req.session.user
         songsRepository.findSong(filter, options).then(song => {
             commentsRepository.getComments(filterComments, {}).then(comments => {
-                res.render("songs/song.twig", {song: song, comments: comments});
+                res.render("songs/song.twig", {song: song, comments: comments, userEmail:email});
             });
 
         }).catch(error => {
