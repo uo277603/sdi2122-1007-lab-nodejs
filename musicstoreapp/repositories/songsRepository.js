@@ -44,6 +44,18 @@ module.exports = {
             throw (error);
         }
     },
+    findPurchase: async function (filter, options) {
+      try{
+          const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+          const database = client.db("musicStore");
+          const collectionName = 'purchases';
+          const purchasesCollection = database.collection(collectionName);
+          const purchase = await purchasesCollection.findOne(filter, options);
+          return purchase;
+      }catch (error){
+          throw (error);
+      }
+    },
     updateSong: async function (newSong, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));

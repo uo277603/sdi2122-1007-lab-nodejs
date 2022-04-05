@@ -36,13 +36,28 @@ module.exports = function (app, songsRepository, commentsRepository) {
             user: req.session.user,
             songId: songId
         }
-        songsRepository.buySong(shop, function (shopId) {
-            if (shopId == null) {
-                res.send("Error al realizar la compra");
+        let options = {};
+        let songFilter = {_id: ObjectId(req.params.id)};
+        let purchaseFilter = {songId: ObjectId(req.params.id), user: req.session.user};
+        songsRepository.findPurchase(purchaseFilter, options).then(purchase => {
+            if (purchase != null) {
+                res.send("El usuario ya ha comprado la canción");
             } else {
-                res.redirect("/purchases");
+                songsRepository.findSong(songFilter, options).then(song => {
+                    if (song.author === req.session.user) {
+                        res.send("El autor no puede comprar su canción")
+                    } else {
+                        songsRepository.buySong(shop, function (shopId) {
+                            if (shopId == null) {
+                                res.send("Error al realizar la compra");
+                            } else {
+                                res.redirect("/purchases");
+                            }
+                        });
+                    }
+                });
             }
-        })
+        });
     });
 
     app.get('/purchases', function (req, res) {
@@ -163,9 +178,14 @@ module.exports = function (app, songsRepository, commentsRepository) {
         let options = {};
         let filterComments = {song_id: ObjectId(req.params.id)};
         let email = req.session.user
+        let purchaseFilter = {songId: ObjectId(req.params.id), user: email};
         songsRepository.findSong(filter, options).then(song => {
             commentsRepository.getComments(filterComments, {}).then(comments => {
-                res.render("songs/song.twig", {song: song, comments: comments, userEmail:email});
+                songsRepository.findPurchase(purchaseFilter, options).then(purchase => {
+                    console.log(purchase)
+                    res.render("songs/song.twig", {song: song, comments: comments, userEmail: email, purchase});
+                })
+
             });
 
         }).catch(error => {
