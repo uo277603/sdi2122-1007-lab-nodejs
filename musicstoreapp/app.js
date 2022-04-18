@@ -7,6 +7,8 @@ const {MongoClient} = require("mongodb");
 const url = "mongodb+srv://admin:sdi@tiendamusica.i6wnd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 var app = express();
+let jwt = require("jsonwebtoken");
+app.set('jwt', jwt)
 
 let expressSession = require('express-session');
 app.use(expressSession({
@@ -49,6 +51,9 @@ const userAuthorRouter = require('./routes/userAuthorRouter');
 app.use("/songs/edit",userAuthorRouter);
 app.use("/songs/delete",userAuthorRouter);
 
+const userTokenRouter = require('./routes/userTokenRoute');
+app.use("/api/v1.0/songs/", userTokenRouter);
+
 
 app.set('connectionStrings', url);
 let songRepository = require("./repositories/songsRepository.js");
@@ -57,7 +62,7 @@ let commentsRepository = require("./repositories/commentsRepository.js");
 commentsRepository.init(app, MongoClient);
 require("./routes/songs.js")(app, songRepository, commentsRepository);
 
-require("./routes/api/songsAPIv1.0.js")(app, songRepository);
+require("./routes/api/songsAPIv1.0.js")(app, songRepository, usersRepository);
 
 require("./routes/authors.js")(app);
 require("./routes/users.js")(app, usersRepository);
