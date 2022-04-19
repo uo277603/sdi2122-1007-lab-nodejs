@@ -130,12 +130,15 @@ module.exports = function (app, songsRepository, usersRepository) {
 
     app.post('/api/v1.0/users/login', function (req, res) {
         try {
+            console.log(req.body)
             let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
                 .update(req.body.password).digest("hex");
+
             let filter = {
                 email: req.body.email,
                 password: securePassword
             }
+
             let options = {};
             usersRepository.findUser(filter, options).then(user => {
                 if (user == null) {
@@ -165,7 +168,7 @@ module.exports = function (app, songsRepository, usersRepository) {
         } catch (e) {
             res.status(500);
             res.json({
-                message: "Se ha producido un error al verficar credenciales",
+                message: "Se ha producido un error al verificar credenciales",
                 authenticated: false
             })
         }
